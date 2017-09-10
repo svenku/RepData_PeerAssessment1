@@ -1,9 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
@@ -11,7 +6,8 @@ output:
 We assume the zipped data file is in same directory as R markdown script.
 
 
-```{r}
+
+```r
 unzip("activity.zip")
 activityData <- read.csv("activity.csv")
 ```
@@ -21,7 +17,8 @@ activityData <- read.csv("activity.csv")
 
 Calculate aggregate steps per day, resulting data is displayed on a histogram.
 
-```{r}
+
+```r
 dailySteps <- setNames(aggregate(activityData$steps, 
                                  list(activityData$date), sum), 
                        c("date", "steps"))
@@ -30,11 +27,25 @@ hist(dailySteps$steps,
      xlab = "Steps per day")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
 Calculate and report the mean and median values of steps per day.
 
-```{r}
+
+```r
 mean(dailySteps$steps, na.rm = TRUE)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(dailySteps$steps, na.rm = TRUE)
+```
+
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
@@ -43,7 +54,8 @@ median(dailySteps$steps, na.rm = TRUE)
 
 Calculate mean steps per 5 min intervals. Display a time series (line) plot of the data.
 
-```{r}
+
+```r
 intervalSteps <- setNames(aggregate(activityData$steps, 
                                     list(activityData$interval), 
                                     mean, na.rm = TRUE), 
@@ -53,15 +65,22 @@ plot(intervalSteps,
      main = "Mean steps during a day",
      xlab = "Time of day (5 min intervals)", 
      ylab = "Mean steps during respective interval")
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 ### 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 Following table shows the 5-minute interval during which maximum number of steps occurs and respective number of steps.
 
-```{r}
+
+```r
 intervalSteps[which.max(intervalSteps$meanSteps), ]
+```
+
+```
+##     interval meanSteps
+## 104      835  206.1698
 ```
 
 
@@ -71,8 +90,13 @@ intervalSteps[which.max(intervalSteps$meanSteps), ]
 
 The number of missing values in original dataset is:
 
-```{r}
+
+```r
 sum(is.na(activityData$steps))
+```
+
+```
+## [1] 2304
 ```
 
 ### 2. Devise a strategy for filling in all of the missing values in the dataset. 
@@ -83,7 +107,8 @@ I am going to replace NA-s with mean value for that 5-minute interval.
 
 New imputedData dataset is created with NAs replaced.
 
-```{r}
+
+```r
 imputedData <- activityData
 
 for (i in 1:nrow(imputedData)) {
@@ -94,7 +119,6 @@ for (i in 1:nrow(imputedData)) {
     }
     
 }
-
 ```
 
 ### 4. Compare the new dataset to the original dataset.
@@ -105,7 +129,8 @@ I am going to repeat the steps in the first part of the assignment, with new dat
 
 Calculate aggregate steps per day, resulting data is displayed on a histogram.
 
-```{r}
+
+```r
 dailyImputedSteps <- setNames(aggregate(imputedData$steps, 
                                  list(imputedData$date), sum), 
                        c("date", "steps"))
@@ -114,11 +139,25 @@ hist(dailyImputedSteps$steps,
      xlab = "Steps per day")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
 Calculate and report the mean and median values of steps per day for the new dataset.
 
-```{r}
+
+```r
 mean(dailyImputedSteps$steps, na.rm = TRUE)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(dailyImputedSteps$steps, na.rm = TRUE)
+```
+
+```
+## [1] 10766.19
 ```
 
 #### Comment:
@@ -135,7 +174,8 @@ I use the dataset with the filled-in missing values for this part as instructed 
 Instead of using suggested weekdays() function, I decided to us strftime(), which seemed more straightforward.
 Results of the code are not displayed.
 
-```{r results = "hide"}
+
+```r
 for (i in 1:nrow(imputedData)) {
     if (as.numeric(strftime(imputedData$date[i], '%u')) == 6 ||
         as.numeric(strftime(imputedData$date[i], '%u')) == 7) {
@@ -147,13 +187,13 @@ for (i in 1:nrow(imputedData)) {
 }
 
 factor(imputedData$typeOfDay)
-
 ```
 
 ### 2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). 
 
 
-```{r}
+
+```r
 library(lattice)
 imputedSteps <- setNames(aggregate(imputedData$steps, 
                                     list(imputedData$interval, 
@@ -164,9 +204,9 @@ xyplot(imputedSteps$meanSteps ~ imputedSteps$interval | imputedSteps$typeOfDay,
        layout = c(1, 2), type = "l", 
        main = "Comparison of activity during weekdays and weekends",
        xlab = "Intervals (time of day)", ylab = "Mean steps during interval")
-
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
 
 
